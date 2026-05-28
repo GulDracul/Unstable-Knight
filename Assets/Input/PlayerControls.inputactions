@@ -4,12 +4,48 @@
     "maps": [
         {
             "name": "Gameplay",
-            "id": "535aabd0-e01a-49d2-b10f-5dd766867c34",
+            "id": "55f7a6c6-4486-4ed3-820a-244022b1480a",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "Movement",
+                    "type": "Value",
+                    "id": "32584159-85be-4a1a-b1d7-2b931bb3b8e2",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Jump",
                     "type": "Button",
-                    "id": "04660a2a-d951-494a-983d-31541485e81c",
+                    "id": "d45f4f05-81f8-476b-992d-f8808d5fc941",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "c652f8d3-1425-460d-8f65-9fe2395b09ed",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AbilityLegs",
+                    "type": "Button",
+                    "id": "50237142-1993-440e-b5b1-08528ca13706",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AbilityChest",
+                    "type": "Button",
+                    "id": "651db035-10f9-4234-a718-d9a89e046f4a",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -19,12 +55,111 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "9cb35712-6c85-4af1-90f5-9db67698e9ba",
-                    "path": "",
+                    "id": "d81c557e-3c53-470a-9321-bf0c33688a62",
+                    "path": "<Gamepad>/dpad",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "e1667f8c-f690-47aa-9f0e-cb78a3d08876",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "9d11aa02-cacd-4bc0-bbcd-a76e8a4d38a9",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "49c03668-e7f0-4504-855a-f09a6b55a824",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "0bf23841-d7e9-4d9e-a9fb-82e65dfde6cf",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "50b13d1f-cfde-46ab-af9e-b46b1c031f1d",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "82ce5d98-045c-4f97-a30a-76bb196d69b4",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4ab4c56a-2a5b-4328-85c6-b0f86fa770c6",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "63ad9bb0-819e-4b27-8c9c-c376de5e8429",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AbilityLegs",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d4f53e14-0401-4842-ace1-6bddfd8e2c2f",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AbilityChest",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
