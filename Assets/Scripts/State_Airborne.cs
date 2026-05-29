@@ -25,11 +25,26 @@ public class State_Airborne : PlayerState
 
     private void HandleShoot()
     {
-        // Mismo cálculo de dirección: Dash aéreo opuesto hacia donde miramos
-        Vector2 facingDirection = input.MovementInput.x != 0 ? new Vector2(input.MovementInput.x, 0).normalized : Vector2.right;
-        Vector2 recoilDirection = -facingDirection;
+        // Si ya usaste la ballesta en el aire, cancelamos el disparo
+        if (!controller.CanUseCrossbowInAir) return;
 
+        // FORZAR 8 DIRECCIONES: Mismo cálculo que en el suelo
+        Vector2 rawAim = input.MovementInput;
+        float snapX = rawAim.x > 0.1f ? 1 : (rawAim.x < -0.1f ? -1 : 0);
+        float snapY = rawAim.y > 0.1f ? 1 : (rawAim.y < -0.1f ? -1 : 0);
+
+        Vector2 snappedAim = new Vector2(snapX, snapY);
+
+        if (snappedAim == Vector2.zero)
+        {
+            snappedAim = new Vector2(controller.LastFacingDirection, 0);
+        }
+
+        Vector2 recoilDirection = -snappedAim.normalized;
         physics.ApplyCrossbowRecoil(recoilDirection);
+
+        // GASTAR BALA: Desactivamos el uso aéreo hasta tocar tierra
+        controller.CanUseCrossbowInAir = false;
     }
 
     public override void Exit()

@@ -8,28 +8,42 @@ public class PlayerController : MonoBehaviour
 
     private PlayerState currentState;
 
-    // Instancias de nuestros estados concretos
     public State_Grounded StateGrounded { get; private set; }
     public State_Airborne StateAirborne { get; private set; }
+
+    public float LastFacingDirection { get; private set; } = 1f;
+
+    // NUEVO: Variables para controlar la ballesta
+    public float CrossbowCooldownTimer { get; set; } = 0f;
+    public bool CanUseCrossbowInAir { get; set; } = true;
 
     private void Awake()
     {
         Input = GetComponent<PlayerInput>();
         Physics = GetComponent<PlayerPhysics>();
 
-        // Inicializamos los estados inyectando este controlador
         StateGrounded = new State_Grounded(this, Physics, Input);
         StateAirborne = new State_Airborne(this, Physics, Input);
     }
 
     private void Start()
     {
-        // Estado inicial
         ChangeState(StateGrounded);
     }
 
     private void Update()
     {
+        if (Input.MovementInput.x != 0)
+        {
+            LastFacingDirection = Mathf.Sign(Input.MovementInput.x);
+        }
+
+        // NUEVO: Reducir el enfriamiento de la ballesta
+        if (CrossbowCooldownTimer > 0)
+        {
+            CrossbowCooldownTimer -= Time.deltaTime;
+        }
+
         currentState?.HandleInput();
         currentState?.Update();
     }

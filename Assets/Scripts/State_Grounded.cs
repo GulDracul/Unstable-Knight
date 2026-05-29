@@ -7,9 +7,11 @@ public class State_Grounded : PlayerState
 
     public override void Enter()
     {
-        // Nos suscribimos a los eventos del Input al entrar al estado
         input.OnJump += HandleJump;
         input.OnShoot += HandleShoot;
+
+        // RECARGA: Al pisar el suelo, recuperas tu dash aéreo
+        controller.CanUseCrossbowInAir = true;
     }
 
     public override void FixedUpdate()
@@ -32,13 +34,26 @@ public class State_Grounded : PlayerState
 
     private void HandleShoot()
     {
-        // Calculamos la dirección opuesta a la que estamos mirando (asumiendo input X)
-        // Si no nos movemos, disparamos hacia adelante y nos empuja hacia atrás.
-        Vector2 facingDirection = input.MovementInput.x != 0 ? new Vector2(input.MovementInput.x, 0).normalized : Vector2.right;
-        Vector2 recoilDirection = -facingDirection;
+        // Si el enfriamiento no ha terminado, cancelamos el disparo
+        if (controller.CrossbowCooldownTimer > 0) return;
 
+        // FORZAR 8 DIRECCIONES: Convertimos cualquier ángulo analógico en -1, 0 o 1
+        Vector2 rawAim = input.MovementInput;
+        float snapX = rawAim.x > 0.1f ? 1 : (rawAim.x < -0.1f ? -1 : 0);
+        float snapY = rawAim.y > 0.1f ? 1 : (rawAim.y < -0.1f ? -1 : 0);
+
+        Vector2 snappedAim = new Vector2(snapX, snapY);
+
+        if (snappedAim == Vector2.zero)
+        {
+            snappedAim = new Vector2(controller.LastFacingDirection, 0);
+        }
+
+        Vector2 recoilDirection = -snappedAim.normalized;
         physics.ApplyCrossbowRecoil(recoilDirection);
-        // El impulso masivo nos levantará o empujará del borde, la transición a Airborne ocurrirá sola en el FixedUpdate
+
+        // ENFRIAMIENTO: Tiempo de espera antes de volver a disparar en el suelo (ej: 0.5 segundos)
+        controller.CrossbowCooldownTimer = 0.5f;
     }
 
     public override void Exit()
