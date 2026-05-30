@@ -9,6 +9,8 @@ public class State_Airborne : PlayerState
     {
         // Escuchamos el disparo en el aire (Dash de la Ballesta)
         input.OnShoot += HandleShoot;
+        // NUEVO: Escuchamos el gatillo derecho
+        input.OnAbilityLegs += HandleLegsAbility;
     }
 
     public override void FixedUpdate()
@@ -46,9 +48,15 @@ public class State_Airborne : PlayerState
         // GASTAR BALA: Desactivamos el uso aéreo hasta tocar tierra
         controller.CanUseCrossbowInAir = false;
     }
-
+    private void HandleLegsAbility()
+    {
+        // Transicionamos al estado de caída libre
+        controller.ChangeState(controller.StateGroundPound);
+    }
     public override void Exit()
     {
         input.OnShoot -= HandleShoot;
+        // NUEVO: Nos desuscribimos al salir
+        input.OnAbilityLegs -= HandleLegsAbility;
     }
 }

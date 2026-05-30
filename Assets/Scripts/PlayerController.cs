@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 
     public State_Grounded StateGrounded { get; private set; }
     public State_Airborne StateAirborne { get; private set; }
-
+    public State_GroundPound StateGroundPound { get; private set; }
     public float LastFacingDirection { get; private set; } = 1f;
 
     // NUEVO: Variables para controlar la ballesta
@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour
 
         StateGrounded = new State_Grounded(this, Physics, Input);
         StateAirborne = new State_Airborne(this, Physics, Input);
+        // Inicializamos el nuevo estado
+        StateGroundPound = new State_GroundPound(this, Physics, Input);
     }
 
     private void Start()
