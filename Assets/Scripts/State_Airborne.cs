@@ -11,14 +11,14 @@ public class State_Airborne : PlayerState
         input.OnShoot += HandleShoot;
         // NUEVO: Escuchamos el gatillo derecho
         input.OnAbilityLegs += HandleLegsAbility;
+        input.OnAbilityChest += HandleChestAbility;
     }
 
     public override void FixedUpdate()
     {
-        // Control aéreo: permitimos moverse pero podrías reducir la velocidad aquí si quieres
-        physics.Move(input.MovementInput);
+        // Le enviamos "true" para indicarle que debe respetar la inercia del péndulo
+        physics.Move(input.MovementInput, true);
 
-        // Si tocamos el suelo, volvemos al estado normal
         if (physics.IsGrounded())
         {
             controller.ChangeState(controller.StateGrounded);
@@ -53,10 +53,15 @@ public class State_Airborne : PlayerState
         // Transicionamos al estado de caída libre
         controller.ChangeState(controller.StateGroundPound);
     }
+    private void HandleChestAbility()
+    {
+        // Cambiamos de estado sin preguntar. El State_Grapple manejará el tiro.
+        controller.ChangeState(controller.StateGrapple);
+    }
     public override void Exit()
     {
         input.OnShoot -= HandleShoot;
-        // NUEVO: Nos desuscribimos al salir
         input.OnAbilityLegs -= HandleLegsAbility;
+        input.OnAbilityChest -= HandleChestAbility;
     }
 }
