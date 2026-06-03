@@ -12,6 +12,7 @@ public class State_Airborne : PlayerState
         // NUEVO: Escuchamos el gatillo derecho
         input.OnAbilityLegs += HandleLegsAbility;
         input.OnAbilityChest += HandleChestAbility;
+        input.OnAbilityArms += HandlePunch;
     }
 
     public override void FixedUpdate()
@@ -63,5 +64,11 @@ public class State_Airborne : PlayerState
         input.OnShoot -= HandleShoot;
         input.OnAbilityLegs -= HandleLegsAbility;
         input.OnAbilityChest -= HandleChestAbility;
+        input.OnAbilityArms -= HandlePunch;
+    }
+    private void HandlePunch()
+    {
+        // Le pasamos a las físicas la dirección hacia la que estamos mirando
+        physics.Punch(controller.LastFacingDirection);
     }
 }

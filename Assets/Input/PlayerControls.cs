@@ -136,6 +136,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AbilityArms"",
+                    ""type"": ""Button"",
+                    ""id"": ""f815731f-3fc2-4a77-ba1e-4a29729715ad"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -292,6 +301,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""AbilityChest"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0136f8bd-6b9c-40be-af46-638e2119060c"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AbilityArms"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5d8f39e3-e77b-4fcc-8837-f67500c86a79"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AbilityArms"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -305,6 +336,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_Shoot = m_Gameplay.FindAction("Shoot", throwIfNotFound: true);
         m_Gameplay_AbilityLegs = m_Gameplay.FindAction("AbilityLegs", throwIfNotFound: true);
         m_Gameplay_AbilityChest = m_Gameplay.FindAction("AbilityChest", throwIfNotFound: true);
+        m_Gameplay_AbilityArms = m_Gameplay.FindAction("AbilityArms", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -390,6 +422,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Shoot;
     private readonly InputAction m_Gameplay_AbilityLegs;
     private readonly InputAction m_Gameplay_AbilityChest;
+    private readonly InputAction m_Gameplay_AbilityArms;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -421,6 +454,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/AbilityChest".
         /// </summary>
         public InputAction @AbilityChest => m_Wrapper.m_Gameplay_AbilityChest;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/AbilityArms".
+        /// </summary>
+        public InputAction @AbilityArms => m_Wrapper.m_Gameplay_AbilityArms;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -462,6 +499,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @AbilityChest.started += instance.OnAbilityChest;
             @AbilityChest.performed += instance.OnAbilityChest;
             @AbilityChest.canceled += instance.OnAbilityChest;
+            @AbilityArms.started += instance.OnAbilityArms;
+            @AbilityArms.performed += instance.OnAbilityArms;
+            @AbilityArms.canceled += instance.OnAbilityArms;
         }
 
         /// <summary>
@@ -488,6 +528,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @AbilityChest.started -= instance.OnAbilityChest;
             @AbilityChest.performed -= instance.OnAbilityChest;
             @AbilityChest.canceled -= instance.OnAbilityChest;
+            @AbilityArms.started -= instance.OnAbilityArms;
+            @AbilityArms.performed -= instance.OnAbilityArms;
+            @AbilityArms.canceled -= instance.OnAbilityArms;
         }
 
         /// <summary>
@@ -563,5 +606,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAbilityChest(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AbilityArms" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAbilityArms(InputAction.CallbackContext context);
     }
 }

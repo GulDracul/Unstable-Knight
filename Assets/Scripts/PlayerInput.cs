@@ -12,6 +12,7 @@ public class PlayerInput : MonoBehaviour
     public event Action OnShoot;
     public event Action OnAbilityLegs;
     public event Action OnAbilityChest;
+    public event Action OnAbilityArms;
 
     // Referencia a la clase que Unity generó automáticamente en el Paso 4
     private PlayerControls controls;
@@ -29,6 +30,7 @@ public class PlayerInput : MonoBehaviour
         controls.Gameplay.Shoot.performed += ctx => OnShoot?.Invoke();
         controls.Gameplay.AbilityLegs.performed += ctx => OnAbilityLegs?.Invoke();
         controls.Gameplay.AbilityChest.performed += ctx => OnAbilityChest?.Invoke();
+        controls.Gameplay.AbilityArms.performed += ctx => OnAbilityArms?.Invoke();
     }
 
     // Es vital activar y desactivar los controles

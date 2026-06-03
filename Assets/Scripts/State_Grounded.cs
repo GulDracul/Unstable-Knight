@@ -9,7 +9,7 @@ public class State_Grounded : PlayerState
     {
         input.OnJump += HandleJump;
         input.OnShoot += HandleShoot;
-
+        input.OnAbilityArms += HandlePunch;
         // RECARGA: Al pisar el suelo, recuperas tu dash aéreo
         controller.CanUseCrossbowInAir = true;
     }
@@ -60,5 +60,11 @@ public class State_Grounded : PlayerState
         // IMPORTANTE: Desuscribirse para no disparar eventos múltiples
         input.OnJump -= HandleJump;
         input.OnShoot -= HandleShoot;
+        input.OnAbilityArms -= HandlePunch;
+    }
+    private void HandlePunch()
+    {
+        // Le pasamos a las físicas la dirección hacia la que estamos mirando
+        physics.Punch(controller.LastFacingDirection);
     }
 }

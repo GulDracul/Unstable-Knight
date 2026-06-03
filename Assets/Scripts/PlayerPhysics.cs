@@ -24,6 +24,10 @@ public class PlayerPhysics : MonoBehaviour
     public float hookSpeed = 40f;     // 1. VELOCIDAD DE VIAJE DEL GANCHO
     public float swingForce = 15f;
 
+    [Header("Guanteletes Cinéticos")]
+    public float punchForce = 1500f; // Fuerza masiva porque la caja ahora pesa 50
+    public float punchRadius = 1.2f; // Tamaño del puño
+
     private DistanceJoint2D currentGrappleJoint;
     private LineRenderer lr; // Para dibujar la cuerda
 
@@ -56,21 +60,14 @@ public class PlayerPhysics : MonoBehaviour
         }
     }
 
-    // Añadimos un booleano para saber si estamos en el aire
     public void Move(Vector2 direction, bool isAirborne = false)
     {
         if (recoilStunTimer > 0) return;
 
-        // LA SOLUCIÓN: Si estamos intentando caminar hacia una pared, cancelamos nuestra intención
-        // de forzar la velocidad horizontal en esa dirección.
-        if (IsHittingWall(direction.x))
-        {
-            direction.x = 0;
-        }
-
         if (isAirborne)
         {
             float targetSpeedX = direction.x * moveSpeed;
+            // Inercia de gancho vs Salto normal
             float airAcceleration = Mathf.Abs(rb.linearVelocity.x) > moveSpeed ? 15f : 100f;
             float newVelocityX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeedX, airAcceleration * Time.deltaTime);
             rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);
@@ -135,11 +132,16 @@ public class PlayerPhysics : MonoBehaviour
         Debug.Log("¡Onda de choque generada!");
     }
 
-    // Opcional: Dibuja un círculo rojo en la escena de Unity para ver el tamaño de tu onda de choque
+
+    // Actualiza tu OnDrawGizmosSelected para poder ver la caja de colisión del golpe en Unity
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, shockwaveRadius);
+        Gizmos.DrawWireSphere(transform.position, shockwaveRadius); // Onda de choque de Grebas
+
+        // Dibuja el círculo del puñetazo hacia la derecha (solo como referencia visual)
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere((Vector2)transform.position + new Vector2(1f * 0.8f, 0), punchRadius);
     }
 
     public void TryShootGrapple(System.Action onHookConnected, System.Action onHookMissed)
@@ -153,14 +155,24 @@ public class PlayerPhysics : MonoBehaviour
         Vector2 currentHookPos = transform.position;
         Vector2 aimDirection = Vector2.up;
 
-        // 1. Calculamos hasta dónde va a llegar el gancho
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, grappleRange, LayerMask.GetMask("Madera"));
+        // 1. CORRECCIÓN: El rayo ahora choca con CUALQUIER obstáculo sólido (Suelo o Madera)
+        int capasSolidas = LayerMask.GetMask("Ground", "Madera");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, grappleRange, capasSolidas);
 
-        // Si pegamos en madera, el objetivo es el impacto. Si no, el objetivo es el rango máximo en el aire.
+        // Calculamos dónde se detiene visualmente el gancho
         Vector2 targetPoint = hit.collider != null ? hit.point : (Vector2)transform.position + (aimDirection * grappleRange);
-        bool success = hit.collider != null;
 
-        // 2. VIAJE DE IDA (El gancho sale disparado)
+        // LA LÓGICA CLAVE: Solo es un "éxito" si chocamos con algo, Y ese algo específicamente es Madera
+        bool success = false;
+        if (hit.collider != null)
+        {
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Madera"))
+            {
+                success = true;
+            }
+        }
+
+        // 2. VIAJE DE IDA
         while (Vector2.Distance(currentHookPos, targetPoint) > 0.5f)
         {
             currentHookPos = Vector2.MoveTowards(currentHookPos, targetPoint, hookSpeed * Time.deltaTime);
@@ -169,7 +181,7 @@ public class PlayerPhysics : MonoBehaviour
         }
         lr.SetPosition(1, targetPoint);
 
-        // 3. BUG 2 SOLUCIONADO: Decidimos si anclamos o recogemos cuerda
+        // 3. DECISIÓN: ¿Nos anclamos o nos rebotó la piedra?
         if (success)
         {
             currentGrappleJoint = gameObject.AddComponent<DistanceJoint2D>();
@@ -177,16 +189,13 @@ public class PlayerPhysics : MonoBehaviour
             currentGrappleJoint.connectedAnchor = targetPoint;
             currentGrappleJoint.autoConfigureDistance = false;
             currentGrappleJoint.distance = Vector2.Distance(transform.position, targetPoint);
-
-            // EL CAMBIO QUE EVITA ATRAVESAR PAREDES:
-            // true = Actúa como una cuerda flexible. Si chocas contra una pared, la cuerda se "destensa" y puedes rebotar sin atravesarla.
             currentGrappleJoint.maxDistanceOnly = true;
 
             onHookConnected?.Invoke();
         }
         else
         {
-            // VIAJE DE VUELTA (El gancho no encontró nada y se devuelve)
+            // VIAJE DE VUELTA (Chocó con piedra o con el aire, se devuelve al jugador)
             while (Vector2.Distance(currentHookPos, transform.position) > 0.5f)
             {
                 currentHookPos = Vector2.MoveTowards(currentHookPos, transform.position, hookSpeed * 2f * Time.deltaTime);
@@ -194,8 +203,8 @@ public class PlayerPhysics : MonoBehaviour
                 yield return null;
             }
 
-            lr.positionCount = 0; // Ocultamos la cuerda
-            onHookMissed?.Invoke(); // Avisamos que falló para volver a caer
+            lr.positionCount = 0;
+            onHookMissed?.Invoke();
         }
     }
     public void DetachGrapple()
@@ -215,35 +224,49 @@ public class PlayerPhysics : MonoBehaviour
         }
     }
 
+
+    // --- MÉTODOS DE LOS GUANTELETES ---
+
+    public void Punch(float facingDir)
+    {
+        // 1. Calculamos el centro del golpe: un poco hacia adelante del jugador
+        Vector2 punchCenter = (Vector2)transform.position + new Vector2(facingDir * 0.8f, 0);
+
+        // 2. Detectamos TODO lo que esté en ese círculo
+        Collider2D[] hits = Physics2D.OverlapCircleAll(punchCenter, punchRadius);
+        bool hitSomething = false;
+
+        foreach (Collider2D hit in hits)
+        {
+            Rigidbody2D hitRb = hit.GetComponent<Rigidbody2D>();
+
+            // Si el objeto tiene Rigidbody, no somos nosotros, y no es el techo/suelo estático
+            if (hitRb != null && hitRb != rb && hitRb.bodyType != RigidbodyType2D.Static)
+            {
+                // Matamos su inercia actual para que el golpe sea limpio
+                hitRb.linearVelocity = Vector2.zero;
+
+                // Calculamos una dirección diagonal (hacia adelante y un poco hacia arriba)
+                Vector2 forceDir = new Vector2(facingDir, 0.5f).normalized;
+
+                // ¡BATEO!
+                hitRb.AddForce(forceDir * punchForce, ForceMode2D.Impulse);
+                hitSomething = true;
+            }
+        }
+
+        // Opcional: Si golpeamos algo, aturdimos al jugador un microsegundo por el impacto
+        if (hitSomething)
+        {
+            recoilStunTimer = 0.1f;
+        }
+    }
     public bool IsGrounded()
     {
         float distance = 1.1f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distance, LayerMask.GetMask("Ground"));
-        return hit.collider != null;
-    }
-    // Método para detectar paredes a los lados
-    public bool IsHittingWall(float directionX)
-    {
-        // Si no pulsas nada, leemos hacia dónde te está llevando la inercia del gancho
-        float checkDir = directionX != 0 ? directionX : rb.velocity.x;
 
-        // Si estamos casi quietos, no necesitamos revisar paredes
-        if (Mathf.Abs(checkDir) < 0.1f) return false;
-
-        float distance = 0.6f;
-        Vector2 checkDirection = checkDir > 0 ? Vector2.right : Vector2.left;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, checkDirection, distance, LayerMask.GetMask("Ground"));
-
-        // DIBUJO VISIBLE (Recuerda mirar la pestaña SCENE o activar "Gizmos" en Game)
-        if (hit.collider != null)
-        {
-            Debug.DrawRay(transform.position, checkDirection * distance, Color.green);
-        }
-        else
-        {
-            Debug.DrawRay(transform.position, checkDirection * distance, Color.red);
-        }
+        // CORRECCIÓN: Ahora el rayo busca chocar contra "Ground" O "Madera"
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distance, LayerMask.GetMask("Ground", "Madera"));
 
         return hit.collider != null;
     }
