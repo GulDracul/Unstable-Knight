@@ -59,6 +59,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "AbilityHead",
+                    "type": "Button",
+                    "id": "33db67ad-8302-438d-96ae-7c0e7d63a1d0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -208,7 +217,7 @@
                 {
                     "name": "",
                     "id": "e5904e5e-f707-4924-b173-fc09cc5fff52",
-                    "path": "<Keyboard>/l",
+                    "path": "<Keyboard>/m",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -230,11 +239,33 @@
                 {
                     "name": "",
                     "id": "5d8f39e3-e77b-4fcc-8837-f67500c86a79",
-                    "path": "<Keyboard>/h",
+                    "path": "<Keyboard>/n",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "AbilityArms",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "049a2923-1239-4ea1-a705-06e25add9c0a",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AbilityHead",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8b4c0089-29e4-4392-8b49-e3c5d3634584",
+                    "path": "<Keyboard>/h",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AbilityHead",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -28,6 +28,13 @@ public class PlayerPhysics : MonoBehaviour
     public float punchForce = 1500f; // Fuerza masiva porque la caja ahora pesa 50
     public float punchRadius = 1.2f; // Tamaño del puño
 
+    [Header("Agua y Yelmo")]
+    public float waterGravityScale = 0.5f; // Flotabilidad (caes muy lento)
+    public float waterMoveSpeed = 4f;      // Caminar/nadar cuesta más esfuerzo
+    public float helmPropulsionForce = 25f;// Impulso tecnológico hacia arriba
+    public float bootsSinkForce = 20f;     // Hundimiento rápido
+
+
     private DistanceJoint2D currentGrappleJoint;
     private LineRenderer lr; // Para dibujar la cuerda
 
@@ -142,6 +149,9 @@ public class PlayerPhysics : MonoBehaviour
         // Dibuja el círculo del puñetazo hacia la derecha (solo como referencia visual)
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere((Vector2)transform.position + new Vector2(1f * 0.8f, 0), punchRadius);
+        // DIBUJO DEL SENSOR DE AGUA (Un círculo celeste en el centro de tu cubo)
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, 0.2f);
     }
 
     public void TryShootGrapple(System.Action onHookConnected, System.Action onHookMissed)
@@ -261,6 +271,33 @@ public class PlayerPhysics : MonoBehaviour
             recoilStunTimer = 0.1f;
         }
     }
+
+    public void MoveInWater(Vector2 direction)
+    {
+        // Movimiento viscoso: aceleración y velocidad reducidas
+        float targetSpeedX = direction.x * waterMoveSpeed;
+        float newVelocityX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeedX, 10f * Time.deltaTime);
+        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);
+    }
+
+    public void SetGravity(float newGravity)
+    {
+        rb.gravityScale = newGravity;
+    }
+
+    public void ApplyHelmPropulsion()
+    {
+        // Frenamos cualquier inercia vertical y disparamos el yelmo hacia arriba
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.AddForce(Vector2.up * helmPropulsionForce, ForceMode2D.Impulse);
+    }
+
+    public void ApplyWaterSink()
+    {
+        // Frenamos y usamos el plomo para hundirnos de golpe
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.AddForce(Vector2.down * bootsSinkForce, ForceMode2D.Impulse);
+    }
     public bool IsGrounded()
     {
         float distance = 1.1f;
@@ -269,5 +306,16 @@ public class PlayerPhysics : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distance, LayerMask.GetMask("Ground", "Madera"));
 
         return hit.collider != null;
+    }
+    public bool IsInWater()
+    {
+        bool touchingWater = Physics2D.OverlapCircle(transform.position, 0.2f, LayerMask.GetMask("Agua")) != null;
+
+        if (touchingWater)
+        {
+            Debug.Log("💦 ¡El sensor físico está tocando la capa Agua!");
+        }
+
+        return touchingWater;
     }
 }

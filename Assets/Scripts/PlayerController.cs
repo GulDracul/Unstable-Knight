@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public State_Grounded StateGrounded { get; private set; }
     public State_Airborne StateAirborne { get; private set; }
     public State_GroundPound StateGroundPound { get; private set; }
-    public State_Grapple StateGrapple { get; private set; }
+    public State_Grapple StateGrapple { get; private set; }public State_Water StateWater { get; private set; }
     public float LastFacingDirection { get; private set; } = 1f;
 
     // NUEVO: Variables para controlar la ballesta
@@ -26,9 +26,8 @@ public class PlayerController : MonoBehaviour
         StateGrounded = new State_Grounded(this, Physics, Input);
         StateAirborne = new State_Airborne(this, Physics, Input);
         StateGroundPound = new State_GroundPound(this, Physics, Input);
-
-        // Inicializamos el nuevo estado del gancho
         StateGrapple = new State_Grapple(this, Physics, Input);
+        StateWater = new State_Water(this, Physics, Input);
     }
 
     private void Start()
@@ -60,6 +59,8 @@ public class PlayerController : MonoBehaviour
 
     public void ChangeState(PlayerState newState)
     {
+        // Esto imprimirá en la consola: "Cambiando de estado a: State_Water"
+        Debug.Log($"Cambiando de estado a: {newState.GetType().Name}");
         currentState?.Exit();
         currentState = newState;
         currentState?.Enter();

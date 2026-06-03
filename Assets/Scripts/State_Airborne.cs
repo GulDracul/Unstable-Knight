@@ -17,6 +17,12 @@ public class State_Airborne : PlayerState
 
     public override void FixedUpdate()
     {
+        // Si tocamos el agua, cambiamos de estado y abortamos el resto del movimiento
+        if (physics.IsInWater())
+        {
+            controller.ChangeState(controller.StateWater);
+            return;
+        }
         // Le enviamos "true" para indicarle que debe respetar la inercia del péndulo
         physics.Move(input.MovementInput, true);
 

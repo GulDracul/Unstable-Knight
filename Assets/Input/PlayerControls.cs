@@ -145,6 +145,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AbilityHead"",
+                    ""type"": ""Button"",
+                    ""id"": ""33db67ad-8302-438d-96ae-7c0e7d63a1d0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -294,7 +303,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e5904e5e-f707-4924-b173-fc09cc5fff52"",
-                    ""path"": ""<Keyboard>/l"",
+                    ""path"": ""<Keyboard>/m"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -316,11 +325,33 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""5d8f39e3-e77b-4fcc-8837-f67500c86a79"",
-                    ""path"": ""<Keyboard>/h"",
+                    ""path"": ""<Keyboard>/n"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""AbilityArms"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""049a2923-1239-4ea1-a705-06e25add9c0a"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AbilityHead"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8b4c0089-29e4-4392-8b49-e3c5d3634584"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AbilityHead"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -337,6 +368,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_AbilityLegs = m_Gameplay.FindAction("AbilityLegs", throwIfNotFound: true);
         m_Gameplay_AbilityChest = m_Gameplay.FindAction("AbilityChest", throwIfNotFound: true);
         m_Gameplay_AbilityArms = m_Gameplay.FindAction("AbilityArms", throwIfNotFound: true);
+        m_Gameplay_AbilityHead = m_Gameplay.FindAction("AbilityHead", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -423,6 +455,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_AbilityLegs;
     private readonly InputAction m_Gameplay_AbilityChest;
     private readonly InputAction m_Gameplay_AbilityArms;
+    private readonly InputAction m_Gameplay_AbilityHead;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -458,6 +491,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/AbilityArms".
         /// </summary>
         public InputAction @AbilityArms => m_Wrapper.m_Gameplay_AbilityArms;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/AbilityHead".
+        /// </summary>
+        public InputAction @AbilityHead => m_Wrapper.m_Gameplay_AbilityHead;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -502,6 +539,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @AbilityArms.started += instance.OnAbilityArms;
             @AbilityArms.performed += instance.OnAbilityArms;
             @AbilityArms.canceled += instance.OnAbilityArms;
+            @AbilityHead.started += instance.OnAbilityHead;
+            @AbilityHead.performed += instance.OnAbilityHead;
+            @AbilityHead.canceled += instance.OnAbilityHead;
         }
 
         /// <summary>
@@ -531,6 +571,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @AbilityArms.started -= instance.OnAbilityArms;
             @AbilityArms.performed -= instance.OnAbilityArms;
             @AbilityArms.canceled -= instance.OnAbilityArms;
+            @AbilityHead.started -= instance.OnAbilityHead;
+            @AbilityHead.performed -= instance.OnAbilityHead;
+            @AbilityHead.canceled -= instance.OnAbilityHead;
         }
 
         /// <summary>
@@ -613,5 +656,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAbilityArms(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AbilityHead" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAbilityHead(InputAction.CallbackContext context);
     }
 }

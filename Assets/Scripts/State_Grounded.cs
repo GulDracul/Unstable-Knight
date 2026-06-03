@@ -16,6 +16,12 @@ public class State_Grounded : PlayerState
 
     public override void FixedUpdate()
     {
+        // Si tocamos el agua, cambiamos de estado y abortamos el resto del movimiento
+        if (physics.IsInWater())
+        {
+            controller.ChangeState(controller.StateWater);
+            return;
+        }
         // En el suelo es false (o no le mandas nada, pero así queda más claro)
         physics.Move(input.MovementInput, false);
 
