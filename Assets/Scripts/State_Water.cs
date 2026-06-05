@@ -13,6 +13,9 @@ public class State_Water : PlayerState
         // SOLO permitimos las reliquias compatibles con el agua
         input.OnAbilityHead += HandleYelmo;
         input.OnAbilityLegs += HandleBotas;
+
+        // NUEVO: Ahora el estado del agua es consciente de que existe el botón de salto
+        input.OnJump += HandleJump;
     }
 
     public override void FixedUpdate()
@@ -37,6 +40,15 @@ public class State_Water : PlayerState
     {
         physics.ApplyWaterSink();
     }
+    // NUEVO: Método del salto
+    private void HandleJump()
+    {
+        // El salto bajo el agua SOLO funciona si tocamos el fondo
+        if (physics.IsGrounded())
+        {
+            physics.ApplyWaterJump();
+        }
+    }
 
     public override void Exit()
     {
@@ -45,5 +57,6 @@ public class State_Water : PlayerState
 
         input.OnAbilityHead -= HandleYelmo;
         input.OnAbilityLegs -= HandleBotas;
+        input.OnJump -= HandleJump;
     }
 }

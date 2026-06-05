@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class State_GroundPound : PlayerState
 {
+    private float startY; // Aquí guardaremos la altura inicial
     public State_GroundPound(PlayerController controller, PlayerPhysics physics, PlayerInput input)
         : base(controller, physics, input) { }
 
     public override void Enter()
     {
+        // 1. Guardamos la posición Y exacta desde la que iniciamos el ataque
+        startY = physics.transform.position.y;
         physics.StartHeavyDrop();
     }
 
@@ -18,10 +21,13 @@ public class State_GroundPound : PlayerState
         // Si chocamos contra el suelo...
         if (physics.IsGrounded())
         {
-            // 1. Explotamos
-            physics.GenerateShockwave();
+            // 2. Calculamos la distancia: Posición de inicio menos Posición actual
+            float dropDistance = startY - physics.transform.position.y;
 
-            // 2. Volvemos al estado normal de caminar
+            // 3. Disparamos la onda de choque pasándole esa distancia
+            physics.TriggerShockwave(dropDistance);
+
+            // Y volvemos al estado normal
             controller.ChangeState(controller.StateGrounded);
         }
     }

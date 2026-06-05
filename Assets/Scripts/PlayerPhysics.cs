@@ -15,8 +15,9 @@ public class PlayerPhysics : MonoBehaviour
     private float defaultGravity;
 
     [Header("Grebas de Plomo")]
+    public float minDropDistanceToBreak = 4f; // Distancia mínima de caída para romper el suelo
+    public float shockwaveRadius = 1.5f;      // El tamaño del radio de destrucción
     public float heavyGravityScale = 10f; // Gravedad exagerada para la caída libre
-    public float shockwaveRadius = 3f;    // Área de efecto de la explosión
     public float shockwaveForce = 15f;    // Fuerza con la que empuja objetos
 
     [Header("Peto con Arpón")]
@@ -33,7 +34,11 @@ public class PlayerPhysics : MonoBehaviour
     public float waterMoveSpeed = 4f;      // Caminar/nadar cuesta más esfuerzo
     public float helmPropulsionForce = 25f;// Impulso tecnológico hacia arriba
     public float bootsSinkForce = 20f;     // Hundimiento rápido
+    public float waterJumpForce = 12f; // Un salto ligeramente más pesado que el salto normal
 
+    [Header("Ballesta")]
+    public GameObject projectilePrefab;
+    public Transform firePoint; // Desde dónde sale la flecha (para que no salga del centro de la barriga)
 
     private DistanceJoint2D currentGrappleJoint;
     private LineRenderer lr; // Para dibujar la cuerda
@@ -95,13 +100,22 @@ public class PlayerPhysics : MonoBehaviour
     // 3. Habilidad: Ballesta (Retroceso masivo)
     public void ApplyCrossbowRecoil(Vector2 recoilDirection)
     {
-        // Detenemos TODA la inercia actual (X e Y). 
-        // Al estar a cero, la fuerza aplicada siempre moverá al cubo exactamente la misma distancia.
         rb.linearVelocity = Vector2.zero;
-
         rb.AddForce(recoilDirection * crossbowRecoilForce, ForceMode2D.Impulse);
-
         recoilStunTimer = 0.2f;
+
+        if (projectilePrefab != null && firePoint != null)
+        {
+            Vector2 shootDirection = -recoilDirection;
+
+            // LA CORRECCIÓN: Movemos la posición local del FirePoint para que orbite al jugador
+            // Multiplicamos la dirección (1) por la distancia que quieres (0.6f)
+            firePoint.localPosition = shootDirection * 0.6f;
+
+            // Ahora sí, disparamos desde la nueva posición
+            GameObject arrow = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+            arrow.GetComponent<Projectile>().Fire(shootDirection);
+        }
     }
     // --- MÉTODOS DE LAS GREBAS ---
 
@@ -138,7 +152,26 @@ public class PlayerPhysics : MonoBehaviour
 
         Debug.Log("¡Onda de choque generada!");
     }
+    // Este es el método que llama el State_GroundPound al aterrizar
+    public void TriggerShockwave(float dropDistance)
+    {
+        // Solo rompemos el suelo si caímos desde suficientemente alto
+        if (dropDistance >= minDropDistanceToBreak)
+        {
+            // Buscamos todo lo que esté en el radio del impacto
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, shockwaveRadius);
 
+            foreach (Collider2D hit in hits)
+            {
+                // Si lo que golpeamos tiene el componente FragileFloor, lo destruimos
+                FragileFloor floor = hit.GetComponent<FragileFloor>();
+                if (floor != null)
+                {
+                    floor.Break();
+                }
+            }
+        }
+    }
 
     // Actualiza tu OnDrawGizmosSelected para poder ver la caja de colisión del golpe en Unity
     private void OnDrawGizmosSelected()
@@ -297,6 +330,12 @@ public class PlayerPhysics : MonoBehaviour
         // Frenamos y usamos el plomo para hundirnos de golpe
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.down * bootsSinkForce, ForceMode2D.Impulse);
+    }
+    public void ApplyWaterJump()
+    {
+        // Matamos la inercia vertical (por si estabas hundiéndote) y aplicamos el impulso
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.AddForce(Vector2.up * waterJumpForce, ForceMode2D.Impulse);
     }
     public bool IsGrounded()
     {
